@@ -5,7 +5,7 @@ import folium
 import webbrowser
 
 My_Window = Tk()
-My_Window.geometry("700x867+750+80") #1920x1080
+My_Window.geometry("423x867+750+80") #1920x1080
 My_Window.resizable(width=False, height=False)
 My_Window.title("Intourmuros")
 My_Window.iconbitmap("icon.ico")
