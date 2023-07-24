@@ -1,8 +1,8 @@
 from tkinter import * # import everying in tkinter
 from tkinter import messagebox
 import customtkinter as ctk
-import folium
 import webbrowser
+
 
 My_Window = Tk()
 My_Window.geometry("423x867+750+80")
@@ -14,7 +14,7 @@ My_Window.iconbitmap("icon.ico")
 def calculate_distance(coordinates1, coordinates2):
 
     # assign the latitude and longitude of a place as coordinates
-    latitude1, longitude1 = coordinates1
+    latitude1, longitude1 = coordinates1 
     latitude2, longitude2 = coordinates2
 
     # get the euclidian distance between 2 coordinates
@@ -25,46 +25,26 @@ def calculate_distance(coordinates1, coordinates2):
 
 # ----- FUNCTION TO USE NEAREST NEIGHBOR ALGORITHM ----- #
 def tsp_nearest_neighbor(locations, selected_starting_point, selected_places):
-    path = [selected_starting_point] #PLM, MAPUA, LYCEUM, LETRAN, PLM
-    unvisited = set(selected_places)
+    path = [selected_starting_point] # the path(list) will store the order in which the place will be visited 
+    unvisited = set(selected_places)  # the unvisited(set) will keep track of the places that is not visited yet
 
-    while unvisited:
-        current_location = path[-1] # LYCEUM
-        nearest_location = None # #LETRAN
-        nearest_distance = float('inf') 
+    while unvisited:    # loop until all places have been visited
+        current_location = path[-1] # retrieves the last element(current location) from path(list)
+        nearest_location = None # store the nearest unvisited location to current location
+        nearest_distance = float('inf') # store the distance to the nearest unvisited location
 
         for neighbor in unvisited:
-            distance = calculate_distance(locations[current_location], locations[neighbor])
-            if distance < nearest_distance:
-                nearest_location = neighbor
-                nearest_distance = distance
+            distance = calculate_distance(locations[current_location], locations[neighbor]) # calculate the distance between current location and current unvisited location
+            if distance < nearest_distance: # check if calculated distance is smaller than current nearest distance
+                nearest_location = neighbor # store the neighbor to nearest location
+                nearest_distance = distance # store the distance to nearest distance
 
-        path.append(nearest_location)
-        unvisited.remove(nearest_location)
+        path.append(nearest_location) # add nearest location to path(list)
+        unvisited.remove(nearest_location) # nearest location to unvisited(set)
 
-    path.append(selected_starting_point)
+    path.append(selected_starting_point)# Add the starting point to the path(starting point also as end point)
     return path
 
-# ----- FUNCTION TO DISPLAY MARKERS OF THE PLACES WITH DISPLACEMENT ----- #
-def display_map(path):
-    # Create a map centered at the first location in the path
-    map_obj = folium.Map(location=locations[path[0]], zoom_start=15)
-
-    # Add markers for each location in the path
-    for index, place in enumerate(path, start=1):
-        folium.Marker(locations[place], popup=f"{index}. {place}").add_to(map_obj)
-
-    # Add a line to connect the places in the path
-    folium.PolyLine([locations[place] for place in path], color="blue", weight=2.5).add_to(map_obj)
-
-    # Save the map to an HTML file
-    map_obj.save("path_map.html")
-
-    # Open the HTML file in a web browser to display the map
-    import webbrowser
-    webbrowser.open("path_map.html")
-
-# ----- FUNCTION TO DISPLAY THE DIRECTIONS IN THE GOOGLE MAPS ----- #
 def show_directions_on_google_maps(locations, path):
     base_url = "https://www.google.com/maps/dir/"
     for i in range(len(path) - 1):
@@ -74,6 +54,8 @@ def show_directions_on_google_maps(locations, path):
         base_url += url_params
 
     webbrowser.open(base_url)
+
+
 
 # ----- FUNCTION TO ACCESS THE LOCATION AND PRINT THE OUTPUT ----- #
 def calculate_path():
@@ -93,18 +75,16 @@ def calculate_path():
         place_label = Label(My_Window, text=place_text, font=("Arial", 14), bg="#FFFAF3", foreground="#1C1C1C")
         place_label.place(x=30, y=y_offset)
         y_offset += 40
-
-    show_map_button = Button(My_Window, text="Show Map", font=('Arial', 10, 'bold'), bg="#202020", activebackground="black",
-                             fg="white", activeforeground="#3699F2", width=37, height=2, bd=0, borderwidth=0, relief=FLAT,
-                             command=lambda: display_map(path))
-    show_map_button.place(x=60, y=750)
-
-    show_maps_button = Button(My_Window, text="Show Directions using Google Maps", font=("Arial", 10, "bold"), bg="#202020",
-                              activebackground="black", fg="white", activeforeground="#3699F2", width=37, height=2,
+    
+    show_maps_button = Button(My_Window, text="Show Google Maps", font=("Arial", 13, "bold"), bg="#202020",
+                              activebackground="black", fg="white", activeforeground="#3699F2", width=16, height=2,
                               bd=0, borderwidth=0, relief=FLAT, command=lambda: show_directions_on_google_maps(locations, path))
-    show_maps_button.place(x=60, y=795)
+    show_maps_button.place(x=140, y=770)
+
+
 
     My_Window.mainloop()
+
 
 # ----- LOCATIONS AVAILABLE WITH ITS COORDINATES ----- #
 locations = {
@@ -122,7 +102,6 @@ locations = {
     'San Agustin Church':(14.5892, 120.9752),
 }
 
-# storage of inputs
 starting_point = IntVar()
 visit_places = []
 
@@ -137,6 +116,7 @@ def StartingPage():
     for i, location in enumerate(locations, start=1):
         ctk.CTkRadioButton(My_Window, text=location, font=("Arial", 18), bg_color="#FFFAF3", fg_color="#3699F2", radiobutton_height=16, radiobutton_width=16,
                              border_width_checked=4 ,variable=starting_point, value=i).place(x=30, y=170+i*42)
+        
 
     # next button
     button_next= Button(My_Window, text="Next", font=('Arial', 13, 'bold'), bg="#202020", activebackground="black",
@@ -146,12 +126,13 @@ def StartingPage():
     
     My_Window.mainloop()
 
-# ----- ERROR WILL POP UP IF NO INPUT FOR STARTING ----- #
 def check_startingplace():
     if starting_point.get() == 0:
         messagebox.showerror("Error", "Please select a starting place.")
     else:
         VisitingPage()
+
+
 
 # ----- PAGE TO GET THE VISITING PLACES ----- #
 def VisitingPage():
@@ -175,5 +156,5 @@ def VisitingPage():
         button_next.place(x=140, y=750)
 
         My_Window.mainloop()
-
+    
 StartingPage()
